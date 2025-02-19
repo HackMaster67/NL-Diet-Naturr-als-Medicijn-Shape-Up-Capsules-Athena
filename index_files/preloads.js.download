@@ -1,0 +1,78 @@
+
+    (function() {
+      var baseURL = "https://cdn.shopify.com/shopifycloud/checkout-web/assets/";
+      var scripts = ["https://cdn.shopify.com/shopifycloud/checkout-web/assets/c1.nl/polyfills.DMy9iVwD.js","https://cdn.shopify.com/shopifycloud/checkout-web/assets/c1.nl/app.svCldGmy.js","https://cdn.shopify.com/shopifycloud/checkout-web/assets/c1.nl/page-OnePage.BApz3iR6.js","https://cdn.shopify.com/shopifycloud/checkout-web/assets/c1.nl/DeliveryMethodSelectorSection.D47a33Xs.js","https://cdn.shopify.com/shopifycloud/checkout-web/assets/c1.nl/useEditorShopPayNavigation.CG8QJjvC.js","https://cdn.shopify.com/shopifycloud/checkout-web/assets/c1.nl/VaultedPayment.BWRw84pT.js","https://cdn.shopify.com/shopifycloud/checkout-web/assets/c1.nl/LocalizationExtensionField.Bibv143c.js","https://cdn.shopify.com/shopifycloud/checkout-web/assets/c1.nl/RememberMeDescriptionText.CeSxkknp.js","https://cdn.shopify.com/shopifycloud/checkout-web/assets/c1.nl/ShopPayOptInDisclaimer.C9Qgg2mF.js","https://cdn.shopify.com/shopifycloud/checkout-web/assets/c1.nl/PayButtonSection.B-s4GiAW.js","https://cdn.shopify.com/shopifycloud/checkout-web/assets/c1.nl/component-ShopPayVerificationSwitch.CW3W9mUh.js","https://cdn.shopify.com/shopifycloud/checkout-web/assets/c1.nl/useSubscribeMessenger.CMqQNNhT.js","https://cdn.shopify.com/shopifycloud/checkout-web/assets/c1.nl/index.D2DDWQVb.js"];
+      var styles = ["https://cdn.shopify.com/shopifycloud/checkout-web/assets/c1.nl/assets/app.Cb38QAdM.css","https://cdn.shopify.com/shopifycloud/checkout-web/assets/c1.nl/assets/OnePage.PMX4OSBO.css","https://cdn.shopify.com/shopifycloud/checkout-web/assets/c1.nl/assets/DeliveryMethodSelectorSection.DmqjTkNB.css","https://cdn.shopify.com/shopifycloud/checkout-web/assets/c1.nl/assets/useEditorShopPayNavigation.DCOTvxC3.css","https://cdn.shopify.com/shopifycloud/checkout-web/assets/c1.nl/assets/ShopPayVerificationSwitch.DW7NMDXG.css"];
+      var fontPreconnectUrls = [];
+      var fontPrefetchUrls = [];
+      var imgPrefetchUrls = [];
+
+      function preconnect(url, callback) {
+        var link = document.createElement('link');
+        link.rel = 'dns-prefetch preconnect';
+        link.href = url;
+        link.crossOrigin = '';
+        link.onload = link.onerror = callback;
+        document.head.appendChild(link);
+      }
+
+      function preconnectAssets() {
+        var resources = [baseURL].concat(fontPreconnectUrls);
+        var index = 0;
+        (function next() {
+          var res = resources[index++];
+          if (res) preconnect(res, next);
+        })();
+      }
+
+      function prefetch(url, as, callback) {
+        var link = document.createElement('link');
+        if (link.relList.supports('prefetch')) {
+          link.rel = 'prefetch';
+          link.fetchPriority = 'low';
+          link.as = as;
+          if (as === 'font') link.type = 'font/woff2';
+          link.href = url;
+          link.crossOrigin = '';
+          link.onload = link.onerror = callback;
+          document.head.appendChild(link);
+        } else {
+          var xhr = new XMLHttpRequest();
+          xhr.open('GET', url, true);
+          xhr.onloadend = callback;
+          xhr.send();
+        }
+      }
+
+      function prefetchAssets() {
+        var resources = [].concat(
+          scripts.map(function(url) { return [url, 'script']; }),
+          styles.map(function(url) { return [url, 'style']; }),
+          fontPrefetchUrls.map(function(url) { return [url, 'font']; }),
+          imgPrefetchUrls.map(function(url) { return [url, 'image']; })
+        );
+        var index = 0;
+        function run() {
+          var res = resources[index++];
+          if (res) prefetch(res[0], res[1], next);
+        }
+        var next = (self.requestIdleCallback || setTimeout).bind(self, run);
+        next();
+      }
+
+      function onLoaded() {
+        try {
+          if (parseFloat(navigator.connection.effectiveType) > 2 && !navigator.connection.saveData) {
+            preconnectAssets();
+            prefetchAssets();
+          }
+        } catch (e) {}
+      }
+
+      if (document.readyState === 'complete') {
+        onLoaded();
+      } else {
+        addEventListener('load', onLoaded);
+      }
+    })();
+  
